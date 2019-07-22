@@ -29,7 +29,8 @@ namespace Demo.API.Controllers
         private readonly IAppSettings _appSettings;
         public UserController(
             IMapper mapper,
-                IUserService userService,IAppSettings appSettings)
+            IUserService userService,
+            IAppSettings appSettings)
         {
             this._userService = userService;
             this._mapper = mapper;
@@ -38,13 +39,13 @@ namespace Demo.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public async Task<IActionResult> Authenticate([FromBody]UserModel model)
+        public async Task<IActionResult> Authenticate([FromBody]UserLoginModel model)
         {
-            if (string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.Password))
+            if (!ModelState.IsValid)
             {
                 return BadRequest(new
                 {
-                    message = $"Incorrect user name and password"
+                    message = GetErrorMessageFromModalState(this.ModelState)
                 });
             }
 

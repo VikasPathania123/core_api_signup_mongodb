@@ -14,3 +14,5 @@
 /src/Demo.Infrastructure/obj
 /src/Demo.Infrastructure.Core/bin/Debug/netcoreapp2.2
 /src/Demo.Infrastructure.Core/obj
+/.vs
+/src/Demo.API/Demo.API.csproj.user

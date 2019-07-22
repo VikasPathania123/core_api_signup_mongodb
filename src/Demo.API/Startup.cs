@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
+using Demo.API.Factory;
 using Demo.API.Mapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
@@ -36,6 +38,14 @@ namespace Demo.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
+            var policy = new CorsPolicy();
+            policy.Headers.Add("*");
+            policy.Methods.Add("*");
+            policy.Origins.Add("*");
+            policy.SupportsCredentials = true;
+
+            services.AddCors(x => x.AddPolicy("corsGlobalPolicy", policy));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddSingleton<IConfiguration>(Configuration);
@@ -44,9 +54,10 @@ namespace Demo.API
             var builder = new ContainerBuilder();
             builder.Populate(services);
 
+            ApiFactory.RegisterDependencies(builder,Configuration);
             this.ApplicationContainer = builder.Build();
 
-            var key = Encoding.ASCII.GetBytes(Configuration["MQ:Dev"]);
+            var key = Encoding.ASCII.GetBytes(Configuration["AppSettings:Secret"]);
             services.AddAuthentication(x =>
                 {
                     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -81,7 +92,8 @@ namespace Demo.API
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+           // app.UseHttpsRedirection();
+            app.UseCors("corsGlobalPolicy");
             app.UseMvc();
         }
     }

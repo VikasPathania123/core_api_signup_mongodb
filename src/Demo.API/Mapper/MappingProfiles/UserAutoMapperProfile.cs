@@ -12,6 +12,7 @@ namespace Demo.API.Mapper.MappingProfiles
         public UserAutoMapperProfile()
         {
             CreateMap<User, UserModel>();
+            CreateMap<UserModel, User>();
         }
     }
 }
