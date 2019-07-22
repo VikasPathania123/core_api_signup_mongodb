@@ -52,7 +52,12 @@ namespace Demo.API.Controllers
             var user = await _userService.Authenticate(model.Username, model.Password);
 
             if (user == null)
-                return Unauthorized();
+            {
+                return BadRequest(new
+                {
+                    message = "Invalid username and password"
+                });
+            }
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
